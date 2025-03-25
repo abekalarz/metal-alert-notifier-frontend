@@ -57,6 +57,62 @@ export class MyElement extends LitElement {
         },
         price: new Map([['LTE', '20.00']]),
       });
+
+    const itemRuleOperatorSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-operator"]'
+    );
+    const itemRuleValuesSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-value"]'
+    );
+    itemRuleOperatorSelect.value = this.rules.item.operator;
+    itemRuleValuesSelect.value = this.rules.item.value;
+
+    const titleInput = this.renderRoot.querySelector('#title');
+    titleInput.value = this.title;
+
+    const contentTextArea = this.renderRoot.querySelector('#content');
+    contentTextArea.value = this.content;
+
+    this.requestUpdate();
+  }
+
+  testData2() {
+    this.title = 'ŻŁOTO niebezpiecznie tanie!';
+    this.content = 'Cena ZŁOTA spadła poniżej wartości granicznej';
+    (this.recipients = ['adam@example.com']),
+      (this.rules = {
+        item: {
+          operator: 'IS_NOT',
+          value: 'GOLD',
+        },
+        price: new Map([['GTE', '40.00']]),
+      });
+
+    const itemRuleOperatorSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-operator"]'
+    );
+    const itemRuleValuesSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-value"]'
+    );
+    itemRuleOperatorSelect.value = this.rules.item.operator;
+    itemRuleValuesSelect.value = this.rules.item.value;
+
+    const titleInput = this.renderRoot.querySelector('#title');
+    titleInput.value = this.title;
+
+    const contentTextArea = this.renderRoot.querySelector('#content');
+    contentTextArea.value = this.content;
+
+    this.requestUpdate();
+  }
+
+  _onShow() {
+    console.log('show data');
+    console.log(this.title);
+    console.log(this.content);
+    console.log(JSON.stringify(this.recipients));
+    console.log(this.rules.item);
+    console.log(this.rules.price);
   }
 
   _onUniqueRecipientAddition() {
@@ -117,6 +173,12 @@ export class MyElement extends LitElement {
       },
       price: mergedPriceRules,
     };
+
+    console.log('mergedPriceRules');
+    console.log(mergedPriceRules);
+    console.log('rules');
+    console.log(rules);
+
     this.rules = rules;
     console.log('Rule added');
     console.log(this.rules);
@@ -145,9 +207,37 @@ export class MyElement extends LitElement {
     this.requestUpdate();
   }
 
-  _onTemplateSelection(itemId) {
-    this.testData1();
-    this.selectedId = itemId;
+  _onTemplateSelection(templateId) {
+    if (templateId === 1) {
+      this.testData1();
+    }
+    if (templateId === 2) {
+      this.testData2();
+    }
+    this.selectedId = templateId;
+  }
+
+  _onNewTemplateAddition() {
+    this.selectedId = '';
+    this.title = '';
+    this.content = '';
+    this.recipients = [];
+    this.rules = {};
+
+    const itemRuleOperatorSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-operator"]'
+    );
+    const itemRuleValuesSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-value"]'
+    );
+    itemRuleOperatorSelect.value = '';
+    itemRuleValuesSelect.value = '';
+
+    this.requestUpdate();
+  }
+
+  _onTemplateSave() {
+    console.log('Template saved');
   }
 
   removeRecipient(value) {
@@ -167,7 +257,9 @@ export class MyElement extends LitElement {
       <body>
         <div class="container">
           <div class="sidebar">
-            <button>Dodaj nowy szablon</button>
+            <button @click=${this._onNewTemplateAddition}>
+              Dodaj nowy szablon
+            </button>
             ${this.allTemplates.map(
               (template) =>
                 html`
@@ -297,6 +389,10 @@ export class MyElement extends LitElement {
                 />
               </div>
               <button @click=${this._onRuleAddition}>Dodaj regułę</button>
+              <hr class="separator" />
+
+              <button @click=${this._onTemplateSave}>ZAPISZ SZABLON</button>
+              <button @click=${this._onShow}>TEST: POKAŻ 'STAN'</button>
             </div>
           </div>
         </div>
