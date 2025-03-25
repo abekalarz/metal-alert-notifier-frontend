@@ -1,6 +1,17 @@
 import {LitElement, html} from 'lit';
 import {templatesStyles} from './my-element.styles.js';
 
+const itemRuleOperators = [
+  {operator: 'IS', label: 'Item is'},
+  {operator: 'IS_NOT', label: 'Item is not'},
+];
+
+const itemRuleValues = [
+  {operator: 'GOLD', label: 'gold'},
+  {operator: 'SILVER', label: 'silver'},
+  {operator: 'PLATINUM', label: 'platinum'},
+];
+
 const priceRuleOperators = [
   {operator: 'EQ', label: 'Price is equal to'},
   {operator: 'GTE', label: 'Price is greater than or equal to'},
@@ -11,14 +22,22 @@ const priceRuleOperators = [
 
 export class MyElement extends LitElement {
   static properties = {
+    allTemplates: {type: Array},
     title: {type: String},
     content: {type: String},
     recipients: {type: Array},
     rules: {type: Object},
+    selectedId: {type: String},
   };
 
   constructor() {
     super();
+    this.allTemplates = [
+      {id: 1, title: 'Srebro niebezpiecznie tanie!'},
+      {id: 2, title: 'Cena złota szaleje'},
+      {id: 3, title: 'Platyna droga jak nigdy!'},
+    ];
+    this.selectedId = '';
     this.title = '';
     this.content = '';
     this.recipients = [];
@@ -26,6 +45,19 @@ export class MyElement extends LitElement {
   }
 
   static styles = templatesStyles;
+
+  testData1() {
+    this.title = 'Srebro niebezpiecznie tanie!';
+    this.content = 'Cena srebra spadła poniżej wartości granicznej';
+    (this.recipients = ['jan@example.com', 'ania@example.com']),
+      (this.rules = {
+        item: {
+          operator: 'IS',
+          value: 'SILVER',
+        },
+        price: new Map([['LTE', '20.00']]),
+      });
+  }
 
   _onUniqueRecipientAddition() {
     const input =
@@ -113,6 +145,11 @@ export class MyElement extends LitElement {
     this.requestUpdate();
   }
 
+  _onTemplateSelection(itemId) {
+    this.testData1();
+    this.selectedId = itemId;
+  }
+
   removeRecipient(value) {
     this.recipients = this.recipients.filter((item) => item !== value);
   }
@@ -131,9 +168,21 @@ export class MyElement extends LitElement {
         <div class="container">
           <div class="sidebar">
             <button>Dodaj nowy szablon</button>
-            <div class="item" id="1">Srebro niebezpiecznie tanie!</div>
-            <div class="item active" id="2">Cena złota szaleje</div>
-            <div class="item" id="3">Platyna droga jak nigdy!</div>
+            ${this.allTemplates.map(
+              (template) =>
+                html`
+                  <div
+                    id=${template.id}
+                    data-template-title="${template.title}"
+                    class="item ${this.selectedId === template.id
+                      ? 'active'
+                      : ''}"
+                    @click=${() => this._onTemplateSelection(template.id)}
+                  >
+                    ${template.title}
+                  </div>
+                `
+            )}
           </div>
 
           <div class="details">
@@ -144,6 +193,7 @@ export class MyElement extends LitElement {
                 id="title"
                 size="50"
                 placeholder="Tytuł szablonu np. 'Cena złota szaleje'"
+                .value=${this.title}
               />
             </div>
 
@@ -188,6 +238,7 @@ export class MyElement extends LitElement {
               <textarea
                 id="content"
                 placeholder="Treść szablonu np. 'Cena złota przekroczyła wartość graniczną, ale nie przekroczyła wartości kosmicznej.'"
+                .value=${this.content}
               ></textarea>
             </div>
 
@@ -198,14 +249,15 @@ export class MyElement extends LitElement {
               <div class="rules" id="rules">
                 <select data-role="new-item-rule-operator">
                   <option value="">--Please choose an option--</option>
-                  <option value="IS">Item is</option>
-                  <option value="IS_NOT">Item is not</option>
+                  ${itemRuleOperators.map(
+                    (o) => html`<option value=${o.operator}>${o.label}</option>`
+                  )}
                 </select>
                 <select data-role="new-item-rule-value">
                   <option value="">--Please choose an option--</option>
-                  <option value="GOLD">gold</option>
-                  <option value="SILVER">silver</option>
-                  <option value="PLATINUM">platinum</option>
+                  ${itemRuleValues.map(
+                    (o) => html`<option value=${o.operator}>${o.label}</option>`
+                  )}
                 </select>
               </div>
               <label for="rules" class="rules-sub-label">Cena</label>
