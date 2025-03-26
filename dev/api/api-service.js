@@ -42,3 +42,17 @@ export async function getTemplateById(templateId) {
 
   return await response.json();
 }
+
+export async function deleteTemplateById(templateId) {
+  const response = await fetch(`${BASE_URL}/${templateId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error during deleting template by id! Status: ${response.status}`
+    );
+  }
+
+  return await response;
+}

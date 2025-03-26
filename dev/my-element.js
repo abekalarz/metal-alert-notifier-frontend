@@ -4,6 +4,7 @@ import {
   createNewTemplate,
   getTemplatesSummary,
   getTemplateById,
+  deleteTemplateById,
 } from './api/api-service.js';
 
 const itemRuleOperators = [
@@ -25,6 +26,7 @@ const priceRuleOperators = [
   {operator: 'LTE', label: 'Price is less than or equal to'},
 ];
 
+// TODO - content, title and recipients are not saved into database!
 export class MyElement extends LitElement {
   static properties = {
     allTemplates: {type: Array},
@@ -66,14 +68,24 @@ export class MyElement extends LitElement {
 
   static styles = templatesStyles;
 
-  // TODO - remove this method after testing
-  async _onShow() {
-    console.log('show data');
-    console.log(this.title);
-    console.log(this.content);
-    console.log(JSON.stringify(this.recipients));
-    console.log(this.rules.item);
-    console.log(this.rules.price);
+  async _onTemplateDeletion() {
+    try {
+      const deletedTemplate = await deleteTemplateById(this.selectedId);
+      // TODO - refactor this part to a separate method
+      const summary = await getTemplatesSummary();
+      this.allTemplates = summary.summary;
+      // TODO - end of refactor
+
+      this.selectedId = '';
+      this.title = '';
+      this.content = '';
+      this.recipients = [];
+      this.rules = {};
+
+      console.log('Template deleted successfully:', deletedTemplate);
+    } catch (error) {
+      console.error('Error deleting template:', error);
+    }
   }
 
   _onUniqueRecipientAddition() {
@@ -203,6 +215,7 @@ export class MyElement extends LitElement {
   }
 
   _onNewTemplateAddition() {
+    // TODO - refactor this part to a separate method
     this.selectedId = '';
     this.title = '';
     this.content = '';
@@ -222,6 +235,18 @@ export class MyElement extends LitElement {
   }
 
   async _onTemplateSave() {
+    // TODO - refactor this part to a separate method
+    // if (
+    //   this.title === '' ||
+    //   this.content === '' ||
+    //   this.recipients.length === 0 ||
+    //   !this.rules.item ||
+    //   !this.rules.price
+    // ) {
+    //   console.error('Template is not fully filled');
+    //   return
+    // }
+    // TODO - end of refactor
     const template = {
       title: this.title,
       content: this.content,
@@ -234,9 +259,15 @@ export class MyElement extends LitElement {
 
     try {
       const savedTemplate = await createNewTemplate(template);
+      // TODO - refactor this part to a separate method
+      const summary = await getTemplatesSummary();
+      this.allTemplates = summary.summary;
+      // TODO - end of refactor
       console.log('Template saved successfully:', savedTemplate);
     } catch (error) {
       console.error('Error saving template:', error);
+    } finally {
+      this.requestUpdate();
     }
     console.log('Template saved');
   }
@@ -247,6 +278,13 @@ export class MyElement extends LitElement {
 
   mapRulePriceOperatorToLabel(operator) {
     return priceRuleOperators.find((o) => o.operator === operator)?.label ?? '';
+  }
+
+  _onShow() {
+    console.log('title = ' + this.title);
+    console.log('content = ' + this.content);
+    console.log('recipients = ' + this.recipients);
+    console.log('rules = ' + JSON.stringify(this.rules));
   }
 
   render() {
@@ -290,6 +328,7 @@ export class MyElement extends LitElement {
                 size="50"
                 placeholder="Tytuł szablonu np. 'Cena złota szaleje'"
                 .value=${this.title}
+                @input=${(e) => (this.title = e.target.value)}
               />
             </div>
 
@@ -335,6 +374,7 @@ export class MyElement extends LitElement {
                 id="content"
                 placeholder="Treść szablonu np. 'Cena złota przekroczyła wartość graniczną, ale nie przekroczyła wartości kosmicznej.'"
                 .value=${this.content}
+                @input=${(e) => (this.content = e.target.value)}
               ></textarea>
             </div>
 
@@ -396,7 +436,12 @@ export class MyElement extends LitElement {
               <hr class="separator" />
 
               <button @click=${this._onTemplateSave}>ZAPISZ SZABLON</button>
-              <button @click=${this._onShow}>TEST: POKAŻ 'STAN'</button>
+              <hr class="separator" />
+
+              <button @click=${this._onTemplateDeletion}>SKASUJ SZABLON</button>
+              <hr class="separator" />
+
+              <button @click=${this._onShow}>POKAŻ STAN</button>
             </div>
           </div>
         </div>
