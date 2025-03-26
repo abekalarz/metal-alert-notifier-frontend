@@ -1,6 +1,6 @@
 import {LitElement, html} from 'lit';
 import {templatesStyles} from './my-element.styles.js';
-import {createNewTemplate} from './api/api-service.js';
+import {createNewTemplate, getTemplatesSummary} from './api/api-service.js';
 
 const itemRuleOperators = [
   {operator: 'IS', label: 'Item is'},
@@ -29,20 +29,35 @@ export class MyElement extends LitElement {
     recipients: {type: Array},
     rules: {type: Object},
     selectedId: {type: String},
+    loading: {type: Boolean},
   };
 
   constructor() {
     super();
-    this.allTemplates = [
-      {id: 1, title: 'Srebro niebezpiecznie tanie!'},
-      {id: 2, title: 'Cena złota szaleje'},
-      {id: 3, title: 'Platyna droga jak nigdy!'},
-    ];
+    this.allTemplates = [];
     this.selectedId = '';
+    this.loading = true;
     this.title = '';
     this.content = '';
     this.recipients = [];
     this.rules = {};
+  }
+
+  firstUpdated() {
+    this.initializeElement();
+  }
+
+  async initializeElement() {
+    try {
+      const summary = await getTemplatesSummary();
+      this.allTemplates = summary.summary;
+
+      console.log('Templates summary correctly applied:', this.allTemplates);
+    } catch (error) {
+      console.error('Error saving template:', error);
+    } finally {
+      this.loading = false;
+    }
   }
 
   static styles = templatesStyles;
@@ -107,7 +122,7 @@ export class MyElement extends LitElement {
     this.requestUpdate();
   }
 
-  _onShow() {
+  async _onShow() {
     console.log('show data');
     console.log(this.title);
     console.log(this.content);
@@ -266,6 +281,9 @@ export class MyElement extends LitElement {
   }
 
   render() {
+    if (this.loading) {
+      return html`<div>Brak szablonów</div>`;
+    }
     return html`
       <head>
         <meta charset="UTF-8" />

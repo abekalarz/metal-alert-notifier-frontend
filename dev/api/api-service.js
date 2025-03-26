@@ -19,12 +19,12 @@ export async function createNewTemplate(template) {
   return await response.json();
 }
 
-export async function getAllSavedTemplates() {
-  const response = await fetch('/api/v1/templates');
+export async function getTemplatesSummary() {
+  const response = await fetch(BASE_URL);
 
   if (!response.ok) {
     throw new Error(
-      `HTTP error during getting all templates! Status: ${response.status}`
+      `HTTP error during getting all template summaries! Status: ${response.status}`
     );
   }
 
