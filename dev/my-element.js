@@ -66,66 +66,7 @@ export class MyElement extends LitElement {
 
   static styles = templatesStyles;
 
-  testData1() {
-    this.title = 'Srebro niebezpiecznie tanie!';
-    this.content = 'Cena srebra spadła poniżej wartości granicznej';
-    (this.recipients = ['jan@example.com', 'ania@example.com']),
-      (this.rules = {
-        item: {
-          operator: 'IS',
-          value: 'SILVER',
-        },
-        price: new Map([['LTE', '20.00']]),
-      });
-
-    const itemRuleOperatorSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-operator"]'
-    );
-    const itemRuleValuesSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-value"]'
-    );
-    itemRuleOperatorSelect.value = this.rules.item.operator;
-    itemRuleValuesSelect.value = this.rules.item.value;
-
-    const titleInput = this.renderRoot.querySelector('#title');
-    titleInput.value = this.title;
-
-    const contentTextArea = this.renderRoot.querySelector('#content');
-    contentTextArea.value = this.content;
-
-    this.requestUpdate();
-  }
-
-  testData2() {
-    this.title = 'ŻŁOTO niebezpiecznie tanie!';
-    this.content = 'Cena ZŁOTA spadła poniżej wartości granicznej';
-    (this.recipients = ['adam@example.com']),
-      (this.rules = {
-        item: {
-          operator: 'IS_NOT',
-          value: 'GOLD',
-        },
-        price: new Map([['GTE', '40.00']]),
-      });
-
-    const itemRuleOperatorSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-operator"]'
-    );
-    const itemRuleValuesSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-value"]'
-    );
-    itemRuleOperatorSelect.value = this.rules.item.operator;
-    itemRuleValuesSelect.value = this.rules.item.value;
-
-    const titleInput = this.renderRoot.querySelector('#title');
-    titleInput.value = this.title;
-
-    const contentTextArea = this.renderRoot.querySelector('#content');
-    contentTextArea.value = this.content;
-
-    this.requestUpdate();
-  }
-
+  // TODO - remove this method after testing
   async _onShow() {
     console.log('show data');
     console.log(this.title);
@@ -228,19 +169,30 @@ export class MyElement extends LitElement {
   }
 
   async _onTemplateSelection(templateId) {
-    // if (templateId === 1) {
-    //   this.testData1();
-    // }
-    // if (templateId === 2) {
-    //   this.testData2();
-    // }
-
     try {
       const template = await getTemplateById(templateId);
+
       this.title = template.title;
       this.content = template.content;
       this.recipients = template.recipients;
-      this.rules = template.rules;
+      this.rules = {
+        item: template.rules.item,
+        price: new Map(Object.entries(template.rules.price)),
+      };
+
+      // TODO - refactor this part
+      const itemRuleOperatorSelect = this.renderRoot.querySelector(
+        '[data-role="new-item-rule-operator"]'
+      );
+      const itemRuleValuesSelect = this.renderRoot.querySelector(
+        '[data-role="new-item-rule-value"]'
+      );
+      itemRuleOperatorSelect.value = this.rules.item.operator;
+      itemRuleValuesSelect.value = this.rules.item.value;
+      // TODO - end of refactor
+
+      console.log('this.rules = ' + JSON.stringify(this.rules));
+
       console.log('Template successfully fetched:', template);
     } catch (error) {
       console.error('Error saving template:', error);
