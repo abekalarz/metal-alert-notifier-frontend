@@ -1,5 +1,6 @@
 import {LitElement, html} from 'lit';
 import {templatesStyles} from './my-element.styles.js';
+import {createNewTemplate} from './api/api-service.js';
 
 const itemRuleOperators = [
   {operator: 'IS', label: 'Item is'},
@@ -236,7 +237,23 @@ export class MyElement extends LitElement {
     this.requestUpdate();
   }
 
-  _onTemplateSave() {
+  async _onTemplateSave() {
+    const template = {
+      title: this.title,
+      content: this.content,
+      recipients: this.recipients,
+      rules: {
+        item: this.rules.item,
+        price: Object.fromEntries(this.rules.price ?? []),
+      },
+    };
+
+    try {
+      const savedTemplate = await createNewTemplate(template);
+      console.log('Template saved successfully:', savedTemplate);
+    } catch (error) {
+      console.error('Error saving template:', error);
+    }
     console.log('Template saved');
   }
 
