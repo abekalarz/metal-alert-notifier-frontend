@@ -1,6 +1,10 @@
 import {LitElement, html} from 'lit';
 import {templatesStyles} from './my-element.styles.js';
-import {createNewTemplate, getTemplatesSummary} from './api/api-service.js';
+import {
+  createNewTemplate,
+  getTemplatesSummary,
+  getTemplateById,
+} from './api/api-service.js';
 
 const itemRuleOperators = [
   {operator: 'IS', label: 'Item is'},
@@ -223,14 +227,27 @@ export class MyElement extends LitElement {
     this.requestUpdate();
   }
 
-  _onTemplateSelection(templateId) {
-    if (templateId === 1) {
-      this.testData1();
+  async _onTemplateSelection(templateId) {
+    // if (templateId === 1) {
+    //   this.testData1();
+    // }
+    // if (templateId === 2) {
+    //   this.testData2();
+    // }
+
+    try {
+      const template = await getTemplateById(templateId);
+      this.title = template.title;
+      this.content = template.content;
+      this.recipients = template.recipients;
+      this.rules = template.rules;
+      console.log('Template successfully fetched:', template);
+    } catch (error) {
+      console.error('Error saving template:', error);
     }
-    if (templateId === 2) {
-      this.testData2();
-    }
+
     this.selectedId = templateId;
+    this.requestUpdate();
   }
 
   _onNewTemplateAddition() {

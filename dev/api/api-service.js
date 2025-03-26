@@ -30,3 +30,15 @@ export async function getTemplatesSummary() {
 
   return await response.json();
 }
+
+export async function getTemplateById(templateId) {
+  const response = await fetch(`${BASE_URL}/${templateId}`);
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error during getting template by id! Status: ${response.status}`
+    );
+  }
+
+  return await response.json();
+}
