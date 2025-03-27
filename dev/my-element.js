@@ -30,12 +30,14 @@ const priceRuleOperators = [
 export class MyElement extends LitElement {
   static properties = {
     allTemplates: {type: Array},
+    selectedId: {type: String},
+    loading: {type: Boolean},
+
+    templateId: {type: String},
     title: {type: String},
     content: {type: String},
     recipients: {type: Array},
     rules: {type: Object},
-    selectedId: {type: String},
-    loading: {type: Boolean},
   };
 
   constructor() {
@@ -43,6 +45,8 @@ export class MyElement extends LitElement {
     this.allTemplates = [];
     this.selectedId = '';
     this.loading = true;
+
+    this.templateId = '';
     this.title = '';
     this.content = '';
     this.recipients = [];
@@ -77,6 +81,7 @@ export class MyElement extends LitElement {
       // TODO - end of refactor
 
       this.selectedId = '';
+      this.templateId = '';
       this.title = '';
       this.content = '';
       this.recipients = [];
@@ -184,6 +189,7 @@ export class MyElement extends LitElement {
     try {
       const template = await getTemplateById(templateId);
 
+      this.templateId = template.id;
       this.title = template.title;
       this.content = template.content;
       this.recipients = template.recipients;
@@ -217,6 +223,7 @@ export class MyElement extends LitElement {
   _onNewTemplateAddition() {
     // TODO - refactor this part to a separate method
     this.selectedId = '';
+    this.templateId = '';
     this.title = '';
     this.content = '';
     this.recipients = [];
@@ -256,12 +263,19 @@ export class MyElement extends LitElement {
         price: Object.fromEntries(this.rules.price ?? []),
       },
     };
+    if (this.templateId != null && this.templateId.length > 0) {
+      template.id = this.templateId;
+    }
+
+    console.log('template to save = ' + JSON.stringify(template));
 
     try {
       const savedTemplate = await createNewTemplate(template);
       // TODO - refactor this part to a separate method
       const summary = await getTemplatesSummary();
       this.allTemplates = summary.summary;
+      this.selectedId = savedTemplate.id;
+      this.templateId = savedTemplate.id;
       // TODO - end of refactor
       console.log('Template saved successfully:', savedTemplate);
     } catch (error) {
@@ -281,6 +295,7 @@ export class MyElement extends LitElement {
   }
 
   _onShow() {
+    console.log('templateId = ' + this.templateId);
     console.log('title = ' + this.title);
     console.log('content = ' + this.content);
     console.log('recipients = ' + this.recipients);
@@ -462,13 +477,13 @@ export class MyElement extends LitElement {
                 class="button positive-button"
                 @click=${this._onTemplateSave}
               >
-                ZAPISZ SZABLON
+                ZAPISZ lub EDYTUJ
               </button>
               <button
                 class="button danger-button"
                 @click=${this._onTemplateDeletion}
               >
-                SKASUJ SZABLON
+                USUŃ
               </button>
               <button @click=${this._onShow}>POKAŻ STAN</button>
             </div>

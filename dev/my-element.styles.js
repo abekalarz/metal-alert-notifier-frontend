@@ -20,6 +20,7 @@ export const templatesStyles = css`
   }
 
   .sidebar .item {
+    font-family: Helvetica, Arial;
     padding: 10px;
     background-color: transparent;
     cursor: pointer;
