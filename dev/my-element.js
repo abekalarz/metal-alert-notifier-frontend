@@ -299,9 +299,14 @@ export class MyElement extends LitElement {
       <body>
         <div class="container">
           <div class="sidebar">
-            <button @click=${this._onNewTemplateAddition}>
+            <button
+              class="button positive-button"
+              @click=${this._onNewTemplateAddition}
+            >
               Dodaj nowy szablon
             </button>
+            <hr class="separator main-separator" />
+
             ${this.allTemplates.map(
               (template) =>
                 html`
@@ -349,11 +354,16 @@ export class MyElement extends LitElement {
                         required
                         data-email-id=${email}
                       />
-                      <button @click=${this._onRecipientDeletion}>Usuń</button>
+                      <button
+                        class="button-small warn-button"
+                        @click=${this._onRecipientDeletion}
+                      >
+                        Usuń
+                      </button>
                     </div>
                   `
                 )}
-                <hr class="separator" />
+                <hr class="separator sub-separator" />
                 <div>
                   <input
                     type="email"
@@ -362,7 +372,10 @@ export class MyElement extends LitElement {
                     size="25"
                   />
                 </div>
-                <button @click=${this._onUniqueRecipientAddition}>
+                <button
+                  class="button-small positive-button"
+                  @click=${this._onUniqueRecipientAddition}
+                >
                   Dodaj odbiorcę
                 </button>
               </div>
@@ -413,11 +426,16 @@ export class MyElement extends LitElement {
                       step="0.01"
                       disabled
                     />
-                    <button @click=${this._onRuleDeletion}>Usuń</button>
+                    <button
+                      class="button-small warn-button"
+                      @click=${this._onRuleDeletion}
+                    >
+                      Usuń
+                    </button>
                   </div>
                 `
               )}
-              <hr class="separator" />
+              <hr class="separator sub-separator" />
               <div class="rules">
                 <select data-role="new-price-rule-operator">
                   <option value="">--Please choose an option--</option>
@@ -432,15 +450,26 @@ export class MyElement extends LitElement {
                   data-role="new-price-rule-value"
                 />
               </div>
-              <button @click=${this._onRuleAddition}>Dodaj regułę</button>
-              <hr class="separator" />
+              <button
+                class="button-small positive-button"
+                @click=${this._onRuleAddition}
+              >
+                Dodaj regułę
+              </button>
+              <hr class="separator main-separator" />
 
-              <button @click=${this._onTemplateSave}>ZAPISZ SZABLON</button>
-              <hr class="separator" />
-
-              <button @click=${this._onTemplateDeletion}>SKASUJ SZABLON</button>
-              <hr class="separator" />
-
+              <button
+                class="button positive-button"
+                @click=${this._onTemplateSave}
+              >
+                ZAPISZ SZABLON
+              </button>
+              <button
+                class="button danger-button"
+                @click=${this._onTemplateDeletion}
+              >
+                SKASUJ SZABLON
+              </button>
               <button @click=${this._onShow}>POKAŻ STAN</button>
             </div>
           </div>
