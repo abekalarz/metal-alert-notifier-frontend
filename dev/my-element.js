@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {templatesStyles} from './my-element.styles.js';
 import {
-  createNewTemplate,
+  createNewTemplateOrUpdate,
   getTemplatesSummary,
   getTemplateById,
   deleteTemplateById,
@@ -270,7 +270,7 @@ export class MyElement extends LitElement {
     console.log('template to save = ' + JSON.stringify(template));
 
     try {
-      const savedTemplate = await createNewTemplate(template);
+      const savedTemplate = await createNewTemplateOrUpdate(template);
       // TODO - refactor this part to a separate method
       const summary = await getTemplatesSummary();
       this.allTemplates = summary.summary;
@@ -294,6 +294,7 @@ export class MyElement extends LitElement {
     return priceRuleOperators.find((o) => o.operator === operator)?.label ?? '';
   }
 
+  // TODO Remove after tests
   _onShow() {
     console.log('templateId = ' + this.templateId);
     console.log('title = ' + this.title);
@@ -485,6 +486,7 @@ export class MyElement extends LitElement {
               >
                 USUŃ
               </button>
+              <!-- TODO Remove after tests -->
               <button @click=${this._onShow}>POKAŻ STAN</button>
             </div>
           </div>

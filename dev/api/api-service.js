@@ -1,7 +1,7 @@
 const BACKEND_HOST = 'http://localhost:8080';
 const BASE_URL = `${BACKEND_HOST}/api/v1/templates`;
 
-export async function createNewTemplate(template) {
+export async function createNewTemplateOrUpdate(template) {
   const response = await fetch(BASE_URL, {
     method: 'POST',
     headers: {
@@ -9,6 +9,12 @@ export async function createNewTemplate(template) {
     },
     body: JSON.stringify(template),
   });
+
+  if (response.status === 400) {
+    const errorResponse = await response.json();
+    console.warn(`Bad request! Check the template data: ${errorResponse}`);
+    return errorResponse.errors;
+  }
 
   if (!response.ok) {
     throw new Error(
