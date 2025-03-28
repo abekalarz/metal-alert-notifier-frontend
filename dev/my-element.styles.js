@@ -27,7 +27,7 @@ export const templatesStyles = css`
   }
 
   .sidebar .item.active {
-    background-color: #aaa;
+    background-color: #aaaaaa;
   }
 
   .details {

@@ -52,7 +52,7 @@ export class MyElement extends LitElement {
         this.clearFormFields();
         this.refreshTemplateList();
 
-        console.log('Template deleted successfully:', deletedTemplate);
+        this.showSuccessPopup('Template deleted successfully');
       }
     } catch (error) {
       console.error('Error deleting template:', error);
@@ -154,7 +154,6 @@ export class MyElement extends LitElement {
         price: new Map(Object.entries(template.rules.price)),
       };
 
-      // TODO - refactor this part
       const itemRuleOperatorSelect = this.renderRoot.querySelector(
         '[data-role="new-item-rule-operator"]'
       );
@@ -163,10 +162,10 @@ export class MyElement extends LitElement {
       );
       itemRuleOperatorSelect.value = this.rules.item.operator;
       itemRuleValuesSelect.value = this.rules.item.value;
-      // TODO - end of refactor
+
       console.log('Template successfully fetched:', template);
     } catch (error) {
-      console.error('Error saving template:', error);
+      console.error('Error during fetch of template data:', error);
     }
 
     this.selectedId = templateId;
@@ -199,13 +198,13 @@ export class MyElement extends LitElement {
       this.refreshTemplateList();
       this.selectedId = savedTemplate.id;
       this.templateId = savedTemplate.id;
-      console.log('Template saved successfully:', savedTemplate);
+
+      this.showSuccessPopup('Template saved successfully');
     } catch (error) {
       console.error('Error saving template:', error);
     } finally {
       this.requestUpdate();
     }
-    console.log('Template saved');
   }
 
   removeRecipient(value) {
@@ -242,10 +241,9 @@ export class MyElement extends LitElement {
   async initializeElement() {
     try {
       await this.refreshTemplateList();
-
-      console.log('Templates summary correctly applied:', this.allTemplates);
+      console.log('Template list correctly refreshed: ', this.allTemplates);
     } catch (error) {
-      console.error('Error saving template:', error);
+      console.error('Template list refreshing failed:', error);
     } finally {
       this.loading = false;
     }
@@ -261,18 +259,20 @@ export class MyElement extends LitElement {
       this.rules.price === undefined ||
       this.rules.price.size === 0
     ) {
+      const errorMessage = 'Some of the template fields are empty';
+      this.showErrorPopup(errorMessage);
       throw new Error('Template is not fully filled');
     }
   }
 
-  // TODO Remove after tests
-  _onShow() {
-    console.log('templateId = ' + this.templateId);
-    console.log('title = ' + this.title);
-    console.log('content = ' + this.content);
-    console.log('recipients = ' + this.recipients);
-    console.log('item rules = ' + this.rules.item);
-    console.log('price rules = ' + this.rules.price);
+  showSuccessPopup(successMessage) {
+    const popup = this.renderRoot.querySelector('success-popup');
+    popup?.show(successMessage);
+  }
+
+  showErrorPopup(errorMessage) {
+    const popup = this.renderRoot.querySelector('error-popup');
+    popup?.show(errorMessage);
   }
 
   render() {
@@ -458,11 +458,11 @@ export class MyElement extends LitElement {
               >
                 USUŃ
               </button>
-              <!-- TODO Remove after tests -->
-              <button @click=${this._onShow}>POKAŻ STAN</button>
             </div>
           </div>
         </div>
+        <error-popup></error-popup>
+        <success-popup></success-popup>
       </body>
     `;
   }
