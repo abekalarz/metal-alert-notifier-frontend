@@ -6,27 +6,12 @@ import {
   getTemplateById,
   deleteTemplateById,
 } from './api/api-service.js';
+import {
+  itemRuleOperators,
+  itemRuleValues,
+  priceRuleOperators,
+} from './constants.js';
 
-const itemRuleOperators = [
-  {operator: 'IS', label: 'Item is'},
-  {operator: 'IS_NOT', label: 'Item is not'},
-];
-
-const itemRuleValues = [
-  {operator: 'GOLD', label: 'gold'},
-  {operator: 'SILVER', label: 'silver'},
-  {operator: 'PLATINUM', label: 'platinum'},
-];
-
-const priceRuleOperators = [
-  {operator: 'EQ', label: 'Price is equal to'},
-  {operator: 'GTE', label: 'Price is greater than or equal to'},
-  {operator: 'GT', label: 'Price is greater than'},
-  {operator: 'LT', label: 'Price is less then'},
-  {operator: 'LTE', label: 'Price is less than or equal to'},
-];
-
-// TODO - content, title and recipients are not saved into database!
 export class MyElement extends LitElement {
   static properties = {
     allTemplates: {type: Array},
@@ -53,41 +38,22 @@ export class MyElement extends LitElement {
     this.rules = {};
   }
 
+  static styles = templatesStyles;
+
   firstUpdated() {
     this.initializeElement();
   }
 
-  async initializeElement() {
-    try {
-      const summary = await getTemplatesSummary();
-      this.allTemplates = summary.summary;
-
-      console.log('Templates summary correctly applied:', this.allTemplates);
-    } catch (error) {
-      console.error('Error saving template:', error);
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  static styles = templatesStyles;
-
   async _onTemplateDeletion() {
     try {
       const deletedTemplate = await deleteTemplateById(this.selectedId);
-      // TODO - refactor this part to a separate method
-      const summary = await getTemplatesSummary();
-      this.allTemplates = summary.summary;
-      // TODO - end of refactor
 
-      this.selectedId = '';
-      this.templateId = '';
-      this.title = '';
-      this.content = '';
-      this.recipients = [];
-      this.rules = {};
+      if (deletedTemplate.status === 200) {
+        this.clearFormFields();
+        this.refreshTemplateList();
 
-      console.log('Template deleted successfully:', deletedTemplate);
+        console.log('Template deleted successfully:', deletedTemplate);
+      }
     } catch (error) {
       console.error('Error deleting template:', error);
     }
@@ -152,6 +118,7 @@ export class MyElement extends LitElement {
       price: mergedPriceRules,
     };
 
+    // TODO Loggers to remove after testing !
     console.log('mergedPriceRules');
     console.log(mergedPriceRules);
     console.log('rules');
@@ -221,23 +188,7 @@ export class MyElement extends LitElement {
   }
 
   _onNewTemplateAddition() {
-    // TODO - refactor this part to a separate method
-    this.selectedId = '';
-    this.templateId = '';
-    this.title = '';
-    this.content = '';
-    this.recipients = [];
-    this.rules = {};
-
-    const itemRuleOperatorSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-operator"]'
-    );
-    const itemRuleValuesSelect = this.renderRoot.querySelector(
-      '[data-role="new-item-rule-value"]'
-    );
-    itemRuleOperatorSelect.value = '';
-    itemRuleValuesSelect.value = '';
-
+    this.clearFormFields();
     this.requestUpdate();
   }
 
@@ -267,16 +218,11 @@ export class MyElement extends LitElement {
       template.id = this.templateId;
     }
 
-    console.log('template to save = ' + JSON.stringify(template));
-
     try {
       const savedTemplate = await createNewTemplateOrUpdate(template);
-      // TODO - refactor this part to a separate method
-      const summary = await getTemplatesSummary();
-      this.allTemplates = summary.summary;
+      this.refreshTemplateList();
       this.selectedId = savedTemplate.id;
       this.templateId = savedTemplate.id;
-      // TODO - end of refactor
       console.log('Template saved successfully:', savedTemplate);
     } catch (error) {
       console.error('Error saving template:', error);
@@ -292,6 +238,41 @@ export class MyElement extends LitElement {
 
   mapRulePriceOperatorToLabel(operator) {
     return priceRuleOperators.find((o) => o.operator === operator)?.label ?? '';
+  }
+
+  async refreshTemplateList() {
+    const summary = await getTemplatesSummary();
+    this.allTemplates = summary.summary;
+  }
+
+  clearFormFields() {
+    this.selectedId = '';
+    this.templateId = '';
+    this.title = '';
+    this.content = '';
+    this.recipients = [];
+    this.rules = {};
+
+    const itemRuleOperatorSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-operator"]'
+    );
+    const itemRuleValuesSelect = this.renderRoot.querySelector(
+      '[data-role="new-item-rule-value"]'
+    );
+    itemRuleOperatorSelect.value = '';
+    itemRuleValuesSelect.value = '';
+  }
+
+  async initializeElement() {
+    try {
+      await this.refreshTemplateList();
+
+      console.log('Templates summary correctly applied:', this.allTemplates);
+    } catch (error) {
+      console.error('Error saving template:', error);
+    } finally {
+      this.loading = false;
+    }
   }
 
   // TODO Remove after tests
