@@ -1,4 +1,4 @@
-# LitElement JavaScript starter
+# metal-alert-notifier-frontend
 
 This project includes a sample component which is responsible for defining metal alert
 notification templates.
