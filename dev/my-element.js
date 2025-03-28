@@ -118,15 +118,7 @@ export class MyElement extends LitElement {
       price: mergedPriceRules,
     };
 
-    // TODO Loggers to remove after testing !
-    console.log('mergedPriceRules');
-    console.log(mergedPriceRules);
-    console.log('rules');
-    console.log(rules);
-
     this.rules = rules;
-    console.log('Rule added');
-    console.log(this.rules);
 
     inputPriceOperator.value = '';
     inputPriceValue.value = '0.00';
@@ -145,9 +137,6 @@ export class MyElement extends LitElement {
         )
       );
     }
-
-    console.log('updated rules =');
-    console.log(this.rules);
 
     this.requestUpdate();
   }
@@ -175,9 +164,6 @@ export class MyElement extends LitElement {
       itemRuleOperatorSelect.value = this.rules.item.operator;
       itemRuleValuesSelect.value = this.rules.item.value;
       // TODO - end of refactor
-
-      console.log('this.rules = ' + JSON.stringify(this.rules));
-
       console.log('Template successfully fetched:', template);
     } catch (error) {
       console.error('Error saving template:', error);
@@ -193,18 +179,8 @@ export class MyElement extends LitElement {
   }
 
   async _onTemplateSave() {
-    // TODO - refactor this part to a separate method
-    // if (
-    //   this.title === '' ||
-    //   this.content === '' ||
-    //   this.recipients.length === 0 ||
-    //   !this.rules.item ||
-    //   !this.rules.price
-    // ) {
-    //   console.error('Template is not fully filled');
-    //   return
-    // }
-    // TODO - end of refactor
+    this.validateIfFieldsAreFilled();
+
     const template = {
       title: this.title,
       content: this.content,
@@ -275,13 +251,28 @@ export class MyElement extends LitElement {
     }
   }
 
+  validateIfFieldsAreFilled() {
+    if (
+      this.title === '' ||
+      this.content === '' ||
+      this.recipients.length === 0 ||
+      this.rules.item === undefined ||
+      this.rules.item.size === 0 ||
+      this.rules.price === undefined ||
+      this.rules.price.size === 0
+    ) {
+      throw new Error('Template is not fully filled');
+    }
+  }
+
   // TODO Remove after tests
   _onShow() {
     console.log('templateId = ' + this.templateId);
     console.log('title = ' + this.title);
     console.log('content = ' + this.content);
     console.log('recipients = ' + this.recipients);
-    console.log('rules = ' + JSON.stringify(this.rules));
+    console.log('item rules = ' + this.rules.item);
+    console.log('price rules = ' + this.rules.price);
   }
 
   render() {
