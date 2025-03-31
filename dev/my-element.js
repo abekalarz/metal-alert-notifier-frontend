@@ -87,21 +87,36 @@ export class MyElement extends LitElement {
 
   _onRuleAddition() {
     const root = this.renderRoot;
+
     const inputItemOperator =
       root.querySelector('[data-role="new-item-rule-operator"]') ?? null;
+    if (!inputItemOperator || inputItemOperator.value === '') {
+      this.showErrorPopup('Musisz wybrać operator dla rodzaju metalu');
+      return;
+    }
+
     const inputItemValue =
       root.querySelector('[data-role="new-item-rule-value"]') ?? null;
+    if (!inputItemValue || inputItemValue.value === '') {
+      this.showErrorPopup('Musisz wybrać wartość dla rodzaju metalu');
+      return;
+    }
+
     const inputPriceOperator =
       root.querySelector('[data-role="new-price-rule-operator"]') ?? null;
+    if (!inputPriceOperator || inputPriceOperator.value === '') {
+      this.showErrorPopup('Musisz wybrać operator ceny');
+      return;
+    }
+
     const inputPriceValue =
       root.querySelector('[data-role="new-price-rule-value"]') ?? null;
-
     if (
-      inputItemOperator.value === '' ||
-      inputItemValue.value === '' ||
-      inputPriceOperator.value === '' ||
-      inputPriceValue.value === '0.00'
+      !inputPriceValue ||
+      isNaN(inputPriceValue.value) ||
+      inputPriceValue.value <= 0
     ) {
+      this.showErrorPopup('Wartość ceny musi być liczbą większą od 0');
       return;
     }
 
